@@ -23,3 +23,4 @@ This project is uploaded for portfolio/demo purposes.
 ## Demo
 ![Upload](upload.png)
 
+![Upload](measurement.png)
