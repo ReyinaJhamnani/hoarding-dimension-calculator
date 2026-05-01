@@ -19,3 +19,7 @@ A computer vision-based web application that calculates real-world hoarding dime
 
 ## Note
 This project is uploaded for portfolio/demo purposes.
+
+## Demo
+
+![Upload](upload.png)
