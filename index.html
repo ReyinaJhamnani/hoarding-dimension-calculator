@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoarding Measurement System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f7f6f2;
+            --surface: #ffffff;
+            --accent: #1a3a5c;
+            --accent-light: #e8f0f8;
+            --text: #1a1a1a;
+            --muted: #6b6b6b;
+            --border: #e0ddd6;
+            --green: #2d6a4f;
+            --green-light: #e8f5ee;
+            --red: #971919;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 20px; height: 20px; fill: none; stroke: white; stroke-width: 2; }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1.2;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+
+        .badge {
+            font-size: 12px;
+            background: var(--green-light);
+            color: var(--green);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            overflow: hidden;
+        }
+
+        .card-top {
+            background: var(--accent);
+            padding: 32px 36px;
+            color: white;
+        }
+
+        .card-top h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-top p {
+            font-size: 14px;
+            opacity: 0.75;
+            line-height: 1.6;
+        }
+
+        .card-body {
+            padding: 36px;
+        }
+
+        .steps {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 6px;
+        }
+
+        .step-text {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .step-line {
+            flex: 0 0 24px;
+            height: 1px;
+            background: var(--border);
+            margin-top: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            color: var(--text);
+            background: var(--bg);
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            background: var(--surface);
+        }
+
+        input[type="text"]::placeholder { color: #b0b0b0; }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg);
+            position: relative;
+        }
+
+        .file-upload:hover { border-color: var(--accent); background: var(--accent-light); }
+        .file-upload.has-file { border-color: var(--green); background: var(--green-light); border-style: solid; }
+
+        .file-upload input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+        }
+
+        .upload-icon {
+            width: 40px; height: 40px;
+            background: var(--accent-light);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .upload-icon svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; stroke-width: 2; }
+        .upload-icon.ready { background: var(--green-light); }
+        .upload-icon.ready svg { stroke: var(--green); }
+
+        .upload-text { font-size: 14px; font-weight: 500; color: var(--text); }
+        .upload-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+        .notice {
+            background: #fff9e6;
+            border: 1px solid #f0d060;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #7a5c00;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .notice-icon { flex-shrink: 0; margin-top: 1px; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover { background: #0e2a45; }
+        .submit-btn:active { transform: scale(0.99); }
+        .submit-btn svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+            <div>
+                <div class="logo-text">Hoarding Measurement System</div>
+                <div class="logo-sub">Computer Vision · Automated Sizing</div>
+            </div>
+        </div>
+        <span class="badge">Active</span>
+    </header>
+
+    <main>
+        <div class="card">
+            <div class="card-top">
+                <h1>Upload Hoarding Image</h1>
+                <p>Place a 2-foot red reference box beside the hoarding before photographing. The system will auto-detect it and calculate real-world dimensions.</p>
+            </div>
+            <div class="card-body">
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-text">Place red box next to hoarding</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-text">Upload photo here</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-text">Mark corners & get measurements</div>
+                    </div>
+                </div>
+
+                <form action="/" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Location / Inspector Note</label>
+                        <input type="text" name="name" placeholder="e.g. MG Road, Near Signal No. 4" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hoarding Image</label>
+                        <div class="file-upload" id="dropzone">
+                            <input type="file" name="image" id="imageInput" accept="image/*" required>
+                            <div class="upload-icon" id="uploadIcon">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            </div>
+                            <div class="upload-text" id="uploadText">Click to upload or drag & drop</div>
+                            <div class="upload-sub" id="uploadSub">JPG, PNG, WEBP supported</div>
+                        </div>
+                    </div>
+
+                    <div class="notice">
+                        <div class="notice-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b07800" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        Ensure the <strong>&nbsp;red reference box&nbsp;</strong> (exactly 2 ft wide) is clearly visible in the photo for accurate measurement.
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                        Analyse Image
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- <footer>
+        &copy; 2024 &nbsp;|&nbsp; Reyina Jhamnani &nbsp;·&nbsp; Nashrah Khan &nbsp;·&nbsp; Leena Deshmukh
+    </footer> -->
+
+    <script>
+        const input = document.getElementById('imageInput');
+        const dropzone = document.getElementById('dropzone');
+        const uploadText = document.getElementById('uploadText');
+        const uploadSub = document.getElementById('uploadSub');
+        const uploadIcon = document.getElementById('uploadIcon');
+
+        input.addEventListener('change', () => {
+            if (input.files[0]) {
+                uploadText.textContent = input.files[0].name;
+                uploadSub.textContent = (input.files[0].size / 1024).toFixed(0) + ' KB · Ready to upload';
+                dropzone.classList.add('has-file');
+                uploadIcon.classList.add('ready');
+                uploadIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+            }
+        });
+    </script>
+</body>
+</html>

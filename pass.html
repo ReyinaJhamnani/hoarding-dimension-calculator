@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Measurement Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f7f6f2;
+            --surface: #ffffff;
+            --accent: #1a3a5c;
+            --accent-light: #e8f0f8;
+            --text: #1a1a1a;
+            --muted: #6b6b6b;
+            --border: #e0ddd6;
+            --green: #2d6a4f;
+            --green-light: #e8f5ee;
+            --red-light: #fdf2f2;
+            --red-text: #971919;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .step-pill {
+            background: var(--green);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .new-btn {
+            padding: 8px 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .page-sub {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .tag-blue { background: var(--accent-light); color: var(--accent); }
+        .tag-green { background: var(--green-light); color: var(--green); }
+        .tag-red { background: var(--red-light); color: var(--red-text); }
+
+        .card-body { padding: 20px; }
+
+        .img-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 14px 16px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .metric-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .metric-unit {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 400;
+            margin-left: 4px;
+        }
+
+        .metric.accent { background: var(--accent); }
+        .metric.accent .metric-label { color: rgba(255,255,255,0.6); }
+        .metric.accent .metric-val { color: white; }
+        .metric.accent .metric-unit { color: rgba(255,255,255,0.6); }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .data-row:last-child { border-bottom: none; }
+        .data-key { color: var(--muted); }
+        .data-val { font-weight: 500; }
+        .data-val.green { color: var(--green); }
+
+        .coords-box {
+            background: var(--bg);
+            border-radius: 6px;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: var(--muted);
+            font-family: monospace;
+            line-height: 1.8;
+            margin-top: 12px;
+            word-break: break-all;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        @media (max-width: 860px) {
+            .grid { grid-template-columns: 1fr; }
+            main { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-text">Hoarding Measurement System</div>
+        <div class="step-indicator">
+            <span class="step-pill">✓ Complete</span>
+            Measurement Results
+        </div>
+        <a href="/" class="new-btn">+ New Analysis</a>
+    </header>
+
+    <main>
+        <div class="page-title">Measurement Report</div>
+        <div class="page-sub">Inspector note: <strong>{{ n }}</strong> &nbsp;·&nbsp; File: {{ fp }}</div>
+
+        <div class="grid">
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Processed Image</span>
+                    <span class="tag tag-blue">Annotated</span>
+                </div>
+                <div class="card-body img-container">
+                    <img src="data:image/jpeg;base64,{{ final_image }}" alt="Annotated Image">
+                </div>
+            </div>
+
+           
+            <div>
+               
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header">
+                        <span class="card-title">Hoarding Dimensions</span>
+                        <span class="tag tag-green">Final Result</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="metric-grid">
+                            <div class="metric accent">
+                                <div class="metric-label">Width</div>
+                                <div class="metric-val">{{ hwft }}<span class="metric-unit">ft</span></div>
+                            </div>
+                            <div class="metric accent">
+                                <div class="metric-label">Height</div>
+                                <div class="metric-val">{{ hhft }}<span class="metric-unit">ft</span></div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Width (px)</div>
+                                <div class="metric-val">{{ hw }}<span class="metric-unit">px</span></div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Height (px)</div>
+                                <div class="metric-val">{{ hh }}<span class="metric-unit">px</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Reference Box (Red)</span>
+                        <span class="tag tag-red">Scale Reference</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-row">
+                            <span class="data-key">Width</span>
+                            <span class="data-val">{{ rw }} px &nbsp;/&nbsp; <span class="green">{{ rwft }} ft</span></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-key">Height</span>
+                            <span class="data-val">{{ rh }} px &nbsp;/&nbsp; <span class="green">{{ rhft }} ft</span></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-key">Known real size</span>
+                            <span class="data-val green">2.0 ft (fixed)</span>
+                        </div>
+
+                        <div class="section-label" style="margin-top: 16px;">Marked Corner Coordinates</div>
+                        <div class="coords-box">{{ c }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

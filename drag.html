@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mark Hoarding Corners</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f7f6f2;
+            --surface: #ffffff;
+            --accent: #1a3a5c;
+            --accent-light: #e8f0f8;
+            --text: #1a1a1a;
+            --muted: #6b6b6b;
+            --border: #e0ddd6;
+            --green: #2d6a4f;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .step-pill {
+            background: var(--accent);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .layout {
+            flex: 1;
+            display: flex;
+            gap: 0;
+        }
+
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .instruction-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .instruction-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .inst-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .divider { height: 1px; background: var(--border); }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .info-label { color: var(--muted); }
+        .info-val { font-weight: 500; color: var(--text); }
+        .info-val.good { color: var(--green); }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .legend-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-line {
+            width: 20px; height: 2px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: auto;
+        }
+
+        .submit-btn:hover { background: #0e2a45; }
+
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 32px;
+            overflow: auto;
+        }
+
+        #imageContainer {
+            position: relative;
+            display: inline-block;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        #uploadedImage {
+            display: block;
+            max-width: 800px;
+            max-height: 650px;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0);
+            cursor: crosshair;
+        }
+
+        .point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #00e676;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #00c853;
+            cursor: move;
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-text">Hoarding Measurement System</div>
+        <div class="step-indicator">
+            <span class="step-pill">Step 2 of 3</span>
+            Mark Hoarding Corners
+        </div>
+    </header>
+
+    <div class="layout">
+        <div class="sidebar">
+            <h2>Mark the Hoarding</h2>
+
+            <ul class="instruction-list">
+                <li><span class="inst-num">1</span>Four green points are pre-placed on the image.</li>
+                <li><span class="inst-num">2</span>Drag each green point to a corner of the hoarding.</li>
+                <li><span class="inst-num">3</span>Ensure the outline covers the full hoarding area.</li>
+                <li><span class="inst-num">4</span>Click "Calculate Measurements" when done.</li>
+            </ul>
+
+            <div class="divider"></div>
+
+            <div class="info-row">
+                <span class="info-label">Inspector Note</span>
+                <span class="info-val">{{ n }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Red Box Width</span>
+                <span class="info-val good">{{ w }} px</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Red Box Height</span>
+                <span class="info-val good">{{ h }} px</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Reference Size</span>
+                <span class="info-val">2.0 ft (fixed)</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#00e676;border:2px solid white;box-shadow:0 0 0 1px #00c853;"></div>
+                    Draggable corner points
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background:#00e676;"></div>
+                    Hoarding boundary outline
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#4ade80; border-radius:2px;"></div>
+                    Auto-detected red box
+                </div>
+            </div>
+
+            <form id="dataForm" action="/pass" method="post">
+                <input type="hidden" name="name" value="{{ n }}">
+                <input type="hidden" name="rw" value="{{ w }}">
+                <input type="hidden" name="rh" value="{{ h }}">
+                <input type="hidden" name="fp1" value="{{ fp1 }}">
+                <input type="hidden" name="annotated_image" id="annotatedImageInput">
+                <input type="hidden" name="coords" id="coordsInput">
+                <input type="hidden" name="drag_width" id="dragWidthInput">
+                <input type="hidden" name="drag_height" id="dragHeightInput">
+                <button type="submit" class="submit-btn">Calculate Measurements →</button>
+            </form>
+        </div>
+
+        <div class="canvas-area">
+            <div id="imageContainer">
+                <img id="uploadedImage" src="data:image/jpeg;base64,{{ annotated_image }}" alt="Uploaded Image">
+                <div id="overlay"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <footer>&copy; 2024 &nbsp;|&nbsp; Reyina Jhamnani &nbsp;·&nbsp; Nashrah Khan &nbsp;·&nbsp; Leena Deshmukh</footer> -->
+
+    <script>
+        const maxWidth = 800;
+        const maxHeight = 650;
+        let image = document.getElementById('uploadedImage');
+        let overlay = document.getElementById('overlay');
+        let points = [];
+        let draggingIndex = null;
+
+        function resizeImage() {
+            const origWidth = image.naturalWidth;
+            const origHeight = image.naturalHeight;
+            const aspectRatio = origWidth / origHeight;
+            if (origWidth > maxWidth || origHeight > maxHeight) {
+                if (aspectRatio > 1) {
+                    image.width = maxWidth;
+                    image.height = Math.floor(maxWidth / aspectRatio);
+                } else {
+                    image.height = maxHeight;
+                    image.width = Math.floor(maxHeight * aspectRatio);
+                }
+            } else {
+                image.width = origWidth;
+                image.height = origHeight;
+            }
+        }
+
+        function initializePoints() {
+            points = [
+                { x: 80, y: 80 },
+                { x: 380, y: 80 },
+                { x: 380, y: 280 },
+                { x: 80, y: 280 }
+            ];
+        }
+
+        overlay.addEventListener('mousedown', (event) => {
+            const rect = image.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            points.forEach((point, index) => {
+                if (Math.abs(point.x - x) < 12 && Math.abs(point.y - y) < 12) {
+                    draggingIndex = index;
+                }
+            });
+        });
+
+        overlay.addEventListener('mousemove', (event) => {
+            if (draggingIndex !== null) {
+                const rect = image.getBoundingClientRect();
+                points[draggingIndex] = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+                drawPoints();
+            }
+        });
+
+        overlay.addEventListener('mouseup', () => { draggingIndex = null; });
+        overlay.addEventListener('mouseleave', () => { draggingIndex = null; });
+
+        function drawPoints() {
+            overlay.innerHTML = '';
+            points.forEach((point, index) => {
+                const pointDiv = document.createElement('div');
+                pointDiv.className = 'point';
+                pointDiv.style.left = `${point.x - 6}px`;
+                pointDiv.style.top = `${point.y - 6}px`;
+                pointDiv.title = `Corner ${index + 1}: (${point.x.toFixed(0)}, ${point.y.toFixed(0)})`;
+                overlay.appendChild(pointDiv);
+                if (index > 0) drawLine(points[index - 1], point);
+                if (index === points.length - 1) drawLine(point, points[0]);
+            });
+            updateHiddenInputs();
+        }
+
+        function drawLine(s, e) {
+            const line = document.createElement('div');
+            const lx = e.x - s.x, ly = e.y - s.y;
+            line.style.cssText = `position:absolute;height:2px;background:#00e676;transform-origin:0 0;left:${s.x}px;top:${s.y}px;width:${Math.sqrt(lx*lx+ly*ly)}px;transform:rotate(${Math.atan2(ly,lx)*180/Math.PI}deg);opacity:0.85;`;
+            overlay.appendChild(line);
+        }
+
+        function calculateDimensions() {
+            const xs = points.map(p => p.x), ys = points.map(p => p.y);
+            document.getElementById("dragWidthInput").value = Math.max(...xs) - Math.min(...xs);
+            document.getElementById("dragHeightInput").value = Math.max(...ys) - Math.min(...ys);
+        }
+
+        function updateHiddenInputs() {
+            document.getElementById("coordsInput").value = points.map(p => `(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`).join('; ');
+            const src = document.getElementById("uploadedImage").src;
+            document.getElementById("annotatedImageInput").value = src.split(',')[1];
+            calculateDimensions();
+        }
+
+        window.onload = () => { resizeImage(); initializePoints(); drawPoints(); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mark Reference Box</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f7f6f2;
+            --surface: #ffffff;
+            --accent: #1a3a5c;
+            --accent-light: #e8f0f8;
+            --text: #1a1a1a;
+            --muted: #6b6b6b;
+            --border: #e0ddd6;
+            --warn: #92400e;
+            --warn-bg: #fffbeb;
+            --warn-border: #f0d060;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .step-pill {
+            background: #b45309;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .alert-banner {
+            background: var(--warn-bg);
+            border-bottom: 1px solid var(--warn-border);
+            padding: 12px 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--warn);
+        }
+
+        .layout {
+            flex: 1;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .instruction-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .instruction-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .inst-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .divider { height: 1px; background: var(--border); }
+
+        .note-box {
+            background: var(--warn-bg);
+            border: 1px solid var(--warn-border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: var(--warn);
+            line-height: 1.6;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: auto;
+        }
+
+        .submit-btn:hover { background: #0e2a45; }
+
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 32px;
+            overflow: auto;
+        }
+
+        #imageContainer {
+            position: relative;
+            display: inline-block;
+            border: 2px solid var(--warn-border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        #uploadedImage {
+            display: block;
+            max-width: 800px;
+            max-height: 650px;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0);
+            cursor: crosshair;
+        }
+
+        .point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #00e676;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #00c853;
+            cursor: move;
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-text">Hoarding Measurement System</div>
+        <div class="step-indicator">
+            <span class="step-pill">⚠ Manual Mode</span>
+            Red Box Not Detected
+        </div>
+    </header>
+
+    <div class="alert-banner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Auto-detection failed — the red reference box was not found. Please mark it manually using the green corner points.
+    </div>
+
+    <div class="layout">
+        <div class="sidebar">
+            <h2>Mark the Red Box</h2>
+
+            <ul class="instruction-list">
+                <li><span class="inst-num">1</span>Locate the red 2-foot reference box in the image.</li>
+                <li><span class="inst-num">2</span>Drag the four green points to the corners of the red box.</li>
+                <li><span class="inst-num">3</span>Make sure the outline covers the red box exactly.</li>
+                <li><span class="inst-num">4</span>Click "Confirm Red Box" when ready.</li>
+            </ul>
+
+            <div class="divider"></div>
+
+            <div class="note-box">
+                This step is needed to establish the measurement scale. Once you confirm the red box corners, you will proceed to mark the hoarding itself.
+            </div>
+
+            <form id="dataForm" action="/redbox" method="post">
+                <input type="hidden" name="fp1" value="{{ fp1 }}">
+                <input type="hidden" name="name" value="{{ n }}">
+                <input type="hidden" name="annotated_image" id="annotatedImageInput">
+                <input type="hidden" name="drag_width" id="dragWidthInput">
+                <input type="hidden" name="drag_height" id="dragHeightInput">
+                <button type="submit" class="submit-btn">Confirm Red Box →</button>
+            </form>
+        </div>
+
+        <div class="canvas-area">
+            <div id="imageContainer">
+                <img id="uploadedImage" src="data:image/jpeg;base64,{{ annotated_image }}" alt="Uploaded Image">
+                <div id="overlay"></div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        const maxWidth = 800, maxHeight = 650;
+        let image = document.getElementById('uploadedImage');
+        let overlay = document.getElementById('overlay');
+        let points = [], draggingIndex = null;
+
+        function resizeImage() {
+            const ow = image.naturalWidth, oh = image.naturalHeight, ar = ow / oh;
+            if (ow > maxWidth || oh > maxHeight) {
+                if (ar > 1) { image.width = maxWidth; image.height = Math.floor(maxWidth / ar); }
+                else { image.height = maxHeight; image.width = Math.floor(maxHeight * ar); }
+            } else { image.width = ow; image.height = oh; }
+        }
+
+        function initializePoints() {
+            points = [{x:80,y:80},{x:280,y:80},{x:280,y:200},{x:80,y:200}];
+        }
+
+        overlay.addEventListener('mousedown', (e) => {
+            const r = image.getBoundingClientRect();
+            const x = e.clientX - r.left, y = e.clientY - r.top;
+            points.forEach((p, i) => { if (Math.abs(p.x-x) < 12 && Math.abs(p.y-y) < 12) draggingIndex = i; });
+        });
+
+        overlay.addEventListener('mousemove', (e) => {
+            if (draggingIndex !== null) {
+                const r = image.getBoundingClientRect();
+                points[draggingIndex] = { x: e.clientX - r.left, y: e.clientY - r.top };
+                drawPoints();
+            }
+        });
+
+        overlay.addEventListener('mouseup', () => { draggingIndex = null; });
+        overlay.addEventListener('mouseleave', () => { draggingIndex = null; });
+
+        function drawPoints() {
+            overlay.innerHTML = '';
+            points.forEach((p, i) => {
+                const d = document.createElement('div');
+                d.className = 'point';
+                d.style.left = `${p.x-6}px`;
+                d.style.top = `${p.y-6}px`;
+                overlay.appendChild(d);
+                if (i > 0) drawLine(points[i-1], p);
+                if (i === points.length - 1) drawLine(p, points[0]);
+            });
+            updateHiddenInputs();
+        }
+
+        function drawLine(s, e) {
+            const lx = e.x-s.x, ly = e.y-s.y, line = document.createElement('div');
+            line.style.cssText = `position:absolute;height:2px;background:#00e676;transform-origin:0 0;left:${s.x}px;top:${s.y}px;width:${Math.sqrt(lx*lx+ly*ly)}px;transform:rotate(${Math.atan2(ly,lx)*180/Math.PI}deg);opacity:0.85;`;
+            overlay.appendChild(line);
+        }
+
+        function updateHiddenInputs() {
+            const src = document.getElementById("uploadedImage").src;
+            document.getElementById("annotatedImageInput").value = src.split(',')[1];
+            const xs = points.map(p=>p.x), ys = points.map(p=>p.y);
+            document.getElementById("dragWidthInput").value = Math.max(...xs) - Math.min(...xs);
+            document.getElementById("dragHeightInput").value = Math.max(...ys) - Math.min(...ys);
+        }
+
+        window.onload = () => { resizeImage(); initializePoints(); drawPoints(); };
+    </script>
+</body>
+</html>
